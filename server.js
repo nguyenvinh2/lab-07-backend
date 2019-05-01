@@ -30,14 +30,14 @@ function locationApp(request, response) {
     })
     .catch(error => handleError(error, response));
 }
-
+//creates darksky API url, then uses superagent to make call
+//then generates array of "Weather" objects to send to front end
 function weatherApp(req, res) {
   const darkSkyUrl = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${req.query.data.latitude},${req.query.data.longitude}`;
   return superagent.get(darkSkyUrl)
     .then(result => {
-      const weatherSummaries = result.body.daily.data.map(day => {
-        return new Weather(day);
-      });
+      //make map one liner
+      const weatherSummaries = result.body.daily.data.map(day => new Weather(day));
       res.send(weatherSummaries);
     })
     .catch(error => handleError(error, res));
