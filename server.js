@@ -1,5 +1,6 @@
 'use strict';
 
+
 const express = require('express');
 const superagent = require('superagent');
 const cors = require('cors');
@@ -14,15 +15,16 @@ app.get('/',(request,response) => {
   response.status(200).send('Connected!');
 });
 
-app.get('/location',(request,response) => {
-  try {
-    const location = require('./data/geo.json');
-    const res = parserExplorer(location,request);
-    response.send(res);
-  } catch(err) {
-    handleError(err, response);
-  }
-});
+const locationApp = (request,response) => {
+  const googleMapsUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
+  return superagent.get(googleMapsUrl)
+    .then( result => {
+      const location = new Location(request.query.data, result.body.results[0].formatted_address,result.body.results[0].geometry.location.lat, result.body.results[0].geometry.location.lng);
+      response.send(location);
+    })
+    .catch( error => handleError(error, response));
+};
+app.get('/location', locationApp);
 
 app.get('/weather', weatherApp);
 
