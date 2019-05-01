@@ -21,7 +21,7 @@ app.get('/weather', weatherApp);
 
 app.get('/events', eventsApp);
 
-const locationApp = (request, response) => {
+function locationApp(request, response) {
   const googleMapsUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
   return superagent.get(googleMapsUrl)
     .then(result => {
@@ -29,7 +29,7 @@ const locationApp = (request, response) => {
       response.send(location);
     })
     .catch(error => handleError(error, response));
-};
+}
 
 function weatherApp(req, res) {
   const darkSkyUrl = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${req.query.data.latitude},${req.query.data.longitude}`;
@@ -44,7 +44,7 @@ function weatherApp(req, res) {
 }
 
 function eventsApp(req, res) {
-  const eventBriteUrl = `https://www.eventbriteapi.com/v3/events/search/?location.within=10mi&location.latitude=${req.query.data.latitude}&location.longitude=${req.query.data.longitude}`;
+  const eventBriteUrl = `https://www.eventbriteapi.com/v3/events/search/?location.within=10mi&location.latitude=${req.query.data.latitude}&location.longitude=${req.query.data.longitude}&token=${process.env.EVENTBRITE_API_KEY}`;
 
   return superagent.get(eventBriteUrl)
     .then(result => {
@@ -76,6 +76,7 @@ function Event(data) {
   this.name = data.name.text;
   this.event_date = new Date(data.start.local).toDateString();
   this.summary = data.description.text;
+  this.created_at = Date.now();
 }
 
 
