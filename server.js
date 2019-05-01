@@ -70,7 +70,7 @@ function Weather(day) {
 //Refactored to pass more concise arguments
 function Location(request, result) {
   this.search_query = request.query.data;
-  this.formatted_query = result.body.results[0];
+  this.formatted_query = result.body.results[0].formatted_address;
   this.latitude = result.body.results[0].geometry.location.lat;
   this.longitude = result.body.results[0].geometry.location.lng;
 }
