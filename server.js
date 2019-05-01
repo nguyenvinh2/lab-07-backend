@@ -21,6 +21,9 @@ app.get('/weather', weatherApp);
 
 app.get('/events', eventsApp);
 
+//uses google API to fetch coordinate data to send to front end using superagent
+//has a catch method to handle bad user search inputs in case google maps cannot
+//find location
 function locationApp(request, response) {
   const googleMapsUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
   return superagent.get(googleMapsUrl)
@@ -30,6 +33,7 @@ function locationApp(request, response) {
     })
     .catch(error => handleError(error, response));
 }
+
 //creates darksky API url, then uses superagent to make call
 //then generates array of "Weather" objects to send to front end
 function weatherApp(req, res) {
@@ -45,7 +49,6 @@ function weatherApp(req, res) {
 
 function eventsApp(req, res) {
   const eventBriteUrl = `https://www.eventbriteapi.com/v3/events/search/?location.within=10mi&location.latitude=${req.query.data.latitude}&location.longitude=${req.query.data.longitude}&token=${process.env.EVENTBRITE_API_KEY}`;
-
   return superagent.get(eventBriteUrl)
     .then(result => {
       const eventSummaries = result.body.events.map(event => new Event(event));
@@ -63,6 +66,7 @@ function Weather(day) {
   this.forecast = day.summary;
   this.created_at = Date.now();
 }
+
 //Refactored to pass more concise arguments
 function Location(request, result) {
   this.search_query = request.query.data;
