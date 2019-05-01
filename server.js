@@ -25,7 +25,7 @@ function locationApp(request, response) {
   const googleMapsUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
   return superagent.get(googleMapsUrl)
     .then(result => {
-      const location = new Location(request.query.data, result.body.results[0].formatted_address, result.body.results[0].geometry.location.lat, result.body.results[0].geometry.location.lng);
+      const location = new Location(request, result);
       response.send(location);
     })
     .catch(error => handleError(error, response));
@@ -63,12 +63,12 @@ function Weather(day) {
   this.forecast = day.summary;
   this.created_at = Date.now();
 }
-
-function Location(query, name, lat, lon) {
-  this.search_query = query;
-  this.formatted_query = name;
-  this.latitude = lat;
-  this.longitude = lon;
+//Refactored to pass more concise arguments
+function Location(request, result) {
+  this.search_query = request.query.data;
+  this.formatted_query = result.body.results[0];
+  this.latitude = result.body.results[0].geometry.location.lat;
+  this.longitude = result.body.results[0].geometry.location.lng;
 }
 
 function Event(data) {
@@ -78,6 +78,5 @@ function Event(data) {
   this.summary = data.description.text;
   this.created_at = Date.now();
 }
-
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
