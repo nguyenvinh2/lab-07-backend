@@ -51,7 +51,7 @@ function eventsApp(req, res) {
   const eventBriteUrl = `https://www.eventbriteapi.com/v3/events/search/?location.within=10mi&location.latitude=${req.query.data.latitude}&location.longitude=${req.query.data.longitude}&token=${process.env.EVENTBRITE_API_KEY}`;
   return superagent.get(eventBriteUrl)
     .then(result => {
-      const eventSummaries = result.body.events.map(event => new Event(event));
+      const eventSummaries = result.body.events.slice(0, 20).map(event => new Event(event));
       res.send(eventSummaries);
     })
     .catch(error => handleError(error, res));
